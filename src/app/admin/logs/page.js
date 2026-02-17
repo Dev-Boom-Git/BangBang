@@ -23,7 +23,7 @@ export default function LogsPage() {
     const [actionFilter, setActionFilter] = useState('');
     const limit = 20;
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('bangbang_token') : null;
     const headers = { Authorization: `Bearer ${token}` };
 
     useEffect(() => { fetchLogs(); }, [page, actionFilter]);

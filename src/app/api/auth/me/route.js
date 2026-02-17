@@ -11,7 +11,7 @@ export async function GET(request) {
         }
 
         const [users] = await pool.query(
-            'SELECT id, name, email, phone, address, role FROM users WHERE id = ?',
+            'SELECT id, name, email, phone, role FROM users WHERE id = ?',
             [decoded.id]
         );
 

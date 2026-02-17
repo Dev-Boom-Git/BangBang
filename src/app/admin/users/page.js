@@ -21,7 +21,7 @@ export default function UsersPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('bangbang_token') : null;
     const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 
     const isSuperAdmin = currentUser?.role === 'superadmin';
