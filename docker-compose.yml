@@ -40,6 +40,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/bangbang.conf:/etc/nginx/conf.d/default.conf
+      - uploads:/uploads
     depends_on:
       - app
 
