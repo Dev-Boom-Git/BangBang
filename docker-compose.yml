@@ -1,0 +1,48 @@
+services:
+  app:
+    build: .
+    container_name: bangbang-app
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/public/uploads
+
+  db:
+    image: mysql:8.0
+    container_name: bangbang-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: BangBang_Root_P@ss!
+      MYSQL_DATABASE: bangbang
+      MYSQL_USER: bangbang_user
+      MYSQL_PASSWORD: BangBang_Str0ng_P@ss!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    container_name: bangbang-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/bangbang.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+volumes:
+  mysql_data:
+  uploads:
