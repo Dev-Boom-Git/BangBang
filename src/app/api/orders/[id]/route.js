@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireStaff, logAdminAction } from '@/lib/auth';
 
-// PUT /api/orders/[id] — admin update order status
+// PUT /api/orders/[id] — staff+ update order status
 export async function PUT(request, { params }) {
     try {
-        const admin = await requireAdmin(request);
+        const admin = await requireStaff(request);
         if (!admin) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -19,6 +19,8 @@ export async function PUT(request, { params }) {
         }
 
         await pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, id]);
+
+        await logAdminAction(admin, 'update_order_status', 'order', parseInt(id), { new_status: status }, request);
 
         return NextResponse.json({ message: 'อัปเดตสถานะสำเร็จ' });
     } catch (error) {

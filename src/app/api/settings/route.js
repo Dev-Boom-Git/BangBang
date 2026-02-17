@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, logAdminAction } from '@/lib/auth';
 
 // GET /api/settings
 export async function GET() {
@@ -33,6 +33,8 @@ export async function PUT(request) {
                 [key, value, value]
             );
         }
+
+        await logAdminAction(admin, 'update_settings', 'settings', null, { keys: Object.keys(settings) }, request);
 
         return NextResponse.json({ message: 'อัปเดตการตั้งค่าสำเร็จ' });
     } catch (error) {

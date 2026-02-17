@@ -15,8 +15,8 @@ export async function GET(request) {
         const params = [];
         const conditions = [];
 
-        // If admin, show all orders; if customer, show only their orders
-        if (user && user.role === 'admin') {
+        // If staff+, show all orders; if customer, show only their orders
+        if (user && ['staff', 'admin', 'superadmin'].includes(user.role)) {
             if (status) {
                 conditions.push('status = ?');
                 params.push(status);

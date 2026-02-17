@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, logAdminAction } from '@/lib/auth';
 
 // GET /api/products — list all products
 export async function GET(request) {
@@ -58,6 +58,8 @@ export async function POST(request) {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [name, name_th, description || '', price, image || null, category_id || null, in_stock !== false, featured || false]
         );
+
+        await logAdminAction(admin, 'create_product', 'product', result.insertId, { name, name_th, price }, request);
 
         return NextResponse.json({ id: result.insertId, message: 'เพิ่มสินค้าสำเร็จ' }, { status: 201 });
     } catch (error) {

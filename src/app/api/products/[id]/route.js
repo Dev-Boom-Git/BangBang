@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, logAdminAction } from '@/lib/auth';
 
 // GET /api/products/[id]
 export async function GET(request, { params }) {
@@ -53,6 +53,8 @@ export async function PUT(request, { params }) {
         values.push(id);
         await pool.query(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`, values);
 
+        await logAdminAction(admin, 'update_product', 'product', parseInt(id), body, request);
+
         return NextResponse.json({ message: 'อัปเดตสินค้าสำเร็จ' });
     } catch (error) {
         console.error('Product PUT error:', error);
@@ -69,7 +71,10 @@ export async function DELETE(request, { params }) {
         }
 
         const { id } = await params;
+        const [existing] = await pool.query('SELECT name FROM products WHERE id = ?', [id]);
         await pool.query('DELETE FROM products WHERE id = ?', [id]);
+
+        await logAdminAction(admin, 'delete_product', 'product', parseInt(id), { deleted_name: existing[0]?.name }, request);
 
         return NextResponse.json({ message: 'ลบสินค้าสำเร็จ' });
     } catch (error) {
