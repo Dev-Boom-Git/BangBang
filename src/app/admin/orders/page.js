@@ -12,27 +12,29 @@ import { toast } from 'sonner';
 import { Eye, Loader2 } from 'lucide-react';
 
 export default function AdminOrdersPage() {
-    const { token } = useAuth();
+    const { user, getToken } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('all');
     const [viewSlip, setViewSlip] = useState(null);
 
-    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
     const fetchOrders = () => {
-        if (!token) return;
+        const t = getToken();
+        if (!t) return;
         const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
-        fetch(`/api/orders${params}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`/api/orders${params}`, { headers: { 'Authorization': `Bearer ${t}` } })
             .then(r => r.json())
             .then(data => { setOrders(data.orders || []); setLoading(false); })
             .catch(() => setLoading(false));
     };
 
-    useEffect(() => { fetchOrders(); }, [token, statusFilter]);
+    useEffect(() => { fetchOrders(); }, [user, statusFilter]);
 
     const updateStatus = async (orderId, newStatus) => {
         try {
+            const t = getToken();
+            const headers = { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' };
             const res = await fetch(`/api/orders/${orderId}`, { method: 'PUT', headers, body: JSON.stringify({ status: newStatus }) });
             if (res.ok) { toast.success('อัปเดตสถานะสำเร็จ'); fetchOrders(); }
         } catch { toast.error('เกิดข้อผิดพลาด'); }

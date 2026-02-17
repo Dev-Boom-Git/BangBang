@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { Search, ClipboardList } from 'lucide-react';
 
 export default function OrdersPage() {
-    const { user, token } = useAuth();
+    const { user, getToken } = useAuth();
     const [orders, setOrders] = useState([]);
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,7 +24,8 @@ export default function OrdersPage() {
             if (searchPhone) params.set('phone', searchPhone);
 
             const headers = {};
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const t = getToken();
+            if (t) headers['Authorization'] = `Bearer ${t}`;
 
             const res = await fetch(`/api/orders?${params}`, { headers });
             const data = await res.json();
@@ -43,8 +44,8 @@ export default function OrdersPage() {
     };
 
     useEffect(() => {
-        if (user && token) fetchOrders();
-    }, [user, token]);
+        if (user) fetchOrders();
+    }, [user]);
 
     return (
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-12">

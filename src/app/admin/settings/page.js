@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { Save, Loader2, Upload, Store, Image as ImageIcon, CreditCard } from 'lucide-react';
 
 export default function AdminSettingsPage() {
-    const { token } = useAuth();
+    const { getToken } = useAuth();
     const [settings, setSettings] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -29,7 +29,7 @@ export default function AdminSettingsPage() {
         try {
             const res = await fetch('/api/settings', {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings),
             });
             if (res.ok) toast.success('บันทึกการตั้งค่าสำเร็จ');

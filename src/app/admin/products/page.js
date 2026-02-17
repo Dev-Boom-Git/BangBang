@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Loader2, Upload } from 'lucide-react';
 
 export default function AdminProductsPage() {
-    const { token } = useAuth();
+    const { user, getToken } = useAuth();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function AdminProductsPage() {
     const [imageFile, setImageFile] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
-    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+    const getHeaders = () => ({ 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' });
 
     const fetchData = () => {
         Promise.all([
@@ -41,7 +41,7 @@ export default function AdminProductsPage() {
         });
     };
 
-    useEffect(() => { if (token) fetchData(); }, [token]);
+    useEffect(() => { if (user) fetchData(); }, [user]);
 
     const openAdd = () => {
         setEditingProduct(null);
@@ -82,10 +82,10 @@ export default function AdminProductsPage() {
             const body = { ...form, price: parseFloat(form.price), image, category_id: form.category_id || null };
 
             if (editingProduct) {
-                await fetch(`/api/products/${editingProduct.id}`, { method: 'PUT', headers, body: JSON.stringify(body) });
+                await fetch(`/api/products/${editingProduct.id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) });
                 toast.success('อัปเดตสินค้าสำเร็จ');
             } else {
-                await fetch('/api/products', { method: 'POST', headers, body: JSON.stringify(body) });
+                await fetch('/api/products', { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) });
                 toast.success('เพิ่มสินค้าสำเร็จ');
             }
             setShowModal(false);
@@ -100,7 +100,7 @@ export default function AdminProductsPage() {
     const handleDelete = async (id) => {
         if (!confirm('คุณต้องการลบสินค้านี้ใช่ไหม?')) return;
         try {
-            await fetch(`/api/products/${id}`, { method: 'DELETE', headers });
+            await fetch(`/api/products/${id}`, { method: 'DELETE', headers: getHeaders() });
             toast.success('ลบสินค้าสำเร็จ');
             fetchData();
         } catch {

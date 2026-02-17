@@ -9,14 +9,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Package, Clock, DollarSign, ShoppingBag } from 'lucide-react';
 
 export default function AdminDashboard() {
-    const { token } = useAuth();
+    const { user, getToken } = useAuth();
     const [stats, setStats] = useState({ totalOrders: 0, pendingOrders: 0, totalRevenue: 0, totalProducts: 0 });
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!token) return;
-        const headers = { 'Authorization': `Bearer ${token}` };
+        if (!user) return;
+        const t = getToken();
+        if (!t) return;
+        const headers = { 'Authorization': `Bearer ${t}` };
 
         Promise.all([
             fetch('/api/orders', { headers }).then(r => r.json()),
@@ -34,7 +36,7 @@ export default function AdminDashboard() {
             setRecentOrders(orders.slice(0, 5));
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, [token]);
+    }, [user]);
 
     const statCards = [
         { icon: Package, label: 'คำสั่งซื้อทั้งหมด', value: stats.totalOrders, color: 'text-blue-600 bg-blue-100' },

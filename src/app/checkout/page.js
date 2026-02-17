@@ -16,7 +16,7 @@ import { Upload, CheckCircle, Loader2 } from 'lucide-react';
 export default function CheckoutPage() {
     const router = useRouter();
     const { items, total, clearCart, mounted } = useCart();
-    const { user, token } = useAuth();
+    const { user, getToken } = useAuth();
     const [settings, setSettings] = useState({});
 
     const [form, setForm] = useState({

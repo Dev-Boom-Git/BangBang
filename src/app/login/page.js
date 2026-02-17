@@ -25,7 +25,7 @@ export default function LoginPage() {
         try {
             const user = await login(email, password);
             toast.success(`ยินดีต้อนรับ ${user.name}! 🎉`);
-            setTimeout(() => router.push(user.role === 'admin' ? '/admin' : '/'), 800);
+            setTimeout(() => router.push(['staff', 'admin', 'superadmin'].includes(user.role) ? '/admin' : '/'), 800);
         } catch (error) {
             toast.error(error.message);
         } finally {

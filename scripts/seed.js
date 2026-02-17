@@ -32,7 +32,7 @@ async function seed() {
       password VARCHAR(255) NOT NULL,
       phone VARCHAR(20),
       address TEXT,
-      role ENUM('customer', 'admin') DEFAULT 'customer',
+      role ENUM('customer', 'staff', 'admin', 'superadmin') DEFAULT 'customer',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
@@ -102,6 +102,22 @@ async function seed() {
     )
   `);
 
+  await conn.query(`
+    CREATE TABLE IF NOT EXISTS admin_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT,
+      user_name VARCHAR(255),
+      user_role VARCHAR(50),
+      action VARCHAR(100) NOT NULL,
+      target_type VARCHAR(100),
+      target_id VARCHAR(100),
+      details JSON,
+      ip_address VARCHAR(100),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    )
+  `);
+
   // ─── Seed Data ────────────────────────────────────────────────
   console.log('🌱 Seeding data...');
 
@@ -119,7 +135,7 @@ async function seed() {
 
   await conn.query(`
     INSERT INTO users (name, email, password, phone, role) VALUES
-    ('Admin ปังๆ', 'admin@bangbang.com', ?, '0812345678', 'admin'),
+    ('Admin ปังๆ', 'admin@bangbang.com', ?, '0812345678', 'superadmin'),
     ('สมชาย ใจดี', 'somchai@example.com', ?, '0891234567', 'customer')
   `, [adminPassword, userPassword]);
 

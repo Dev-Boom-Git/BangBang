@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
             if (res.ok) {
                 const data = await res.json();
                 setUser(data.user);
+                setToken(t);
             } else {
                 localStorage.removeItem('bangbang_token');
                 setToken(null);
@@ -75,8 +76,13 @@ export function AuthProvider({ children }) {
         setUser(null);
     }, []);
 
+    // Helper: always get fresh token from localStorage
+    const getToken = useCallback(() => {
+        return localStorage.getItem('bangbang_token');
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, getToken }}>
             {children}
         </AuthContext.Provider>
     );
