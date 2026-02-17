@@ -64,7 +64,7 @@ export default function Navbar() {
                     {user ? (
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-muted-foreground">สวัสดี, {user.name}</span>
-                            {user.role === 'admin' && (
+                            {['staff', 'admin', 'superadmin'].includes(user.role) && (
                                 <Link href="/admin">
                                     <Button variant="gold" size="sm">
                                         <Settings className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export default function Navbar() {
                         {user ? (
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground px-4 py-1">สวัสดี, {user.name}</p>
-                                {user.role === 'admin' && (
+                                {['staff', 'admin', 'superadmin'].includes(user.role) && (
                                     <Link href="/admin" onClick={() => setMenuOpen(false)}>
                                         <Button variant="gold" className="w-full justify-start gap-2">
                                             <Settings className="w-4 h-4" /> Admin Panel
