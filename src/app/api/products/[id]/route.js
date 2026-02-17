@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireAdmin, logAdminAction } from '@/lib/auth';
+import { unlink } from 'fs/promises';
+import path from 'path';
+
+async function deleteOldImage(imageUrl) {
+    if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
+    try {
+        const filePath = path.join(process.cwd(), 'public', imageUrl);
+        await unlink(filePath);
+    } catch (err) {
+        // File might not exist, ignore
+    }
+}
 
 // GET /api/products/[id]
 export async function GET(request, { params }) {
@@ -38,6 +50,14 @@ export async function PUT(request, { params }) {
         const fields = [];
         const values = [];
 
+        // If image is being updated, delete the old one
+        if (body.image) {
+            const [existing] = await pool.query('SELECT image FROM products WHERE id = ?', [id]);
+            if (existing[0]?.image && existing[0].image !== body.image) {
+                await deleteOldImage(existing[0].image);
+            }
+        }
+
         const allowedFields = ['name', 'name_th', 'description', 'price', 'image', 'category_id', 'in_stock', 'featured'];
         for (const field of allowedFields) {
             if (body[field] !== undefined) {
@@ -71,8 +91,13 @@ export async function DELETE(request, { params }) {
         }
 
         const { id } = await params;
-        const [existing] = await pool.query('SELECT name FROM products WHERE id = ?', [id]);
+        const [existing] = await pool.query('SELECT name, image FROM products WHERE id = ?', [id]);
         await pool.query('DELETE FROM products WHERE id = ?', [id]);
+
+        // Delete product image from disk
+        if (existing[0]?.image) {
+            await deleteOldImage(existing[0].image);
+        }
 
         await logAdminAction(admin, 'delete_product', 'product', parseInt(id), { deleted_name: existing[0]?.name }, request);
 

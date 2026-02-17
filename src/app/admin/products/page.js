@@ -76,7 +76,13 @@ export default function AdminProductsPage() {
                 formData.append('folder', 'products');
                 const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
                 const uploadData = await uploadRes.json();
-                if (uploadRes.ok) image = uploadData.url;
+                if (uploadRes.ok) {
+                    image = uploadData.url;
+                } else {
+                    toast.error(uploadData.error || 'อัปโหลดรูปภาพล้มเหลว');
+                    setSubmitting(false);
+                    return;
+                }
             }
 
             const body = { ...form, price: parseFloat(form.price), image, category_id: form.category_id || null };
