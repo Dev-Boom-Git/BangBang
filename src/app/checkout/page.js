@@ -76,7 +76,8 @@ export default function CheckoutPage() {
             };
 
             const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const t = getToken();
+            if (t) headers['Authorization'] = `Bearer ${t}`;
 
             const res = await fetch('/api/orders', { method: 'POST', headers, body: JSON.stringify(body) });
 
